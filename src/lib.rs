@@ -1,5 +1,5 @@
-use std::sync::{Arc, mpsc, Mutex};
 use std::sync::mpsc::Receiver;
+use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
 
 pub struct ThreadPool {
@@ -14,8 +14,7 @@ pub struct Worker {
 
 type Job = Box<dyn FnOnce() + Send + 'static>;
 
-impl ThreadPool
-{
+impl ThreadPool {
     pub fn new(size: usize) -> ThreadPool {
         assert!(size > 0);
 
@@ -35,7 +34,8 @@ impl ThreadPool
     }
 
     pub fn execute<F>(&self, f: F)
-        where F: FnOnce() + Send + 'static
+    where
+        F: FnOnce() + Send + 'static,
     {
         let job = Box::new(f);
         self.sender.as_ref().unwrap().send(job).unwrap();
@@ -72,6 +72,9 @@ impl Worker {
             }
         });
 
-        Worker { work_thread: Some(work_thread), id }
+        Worker {
+            work_thread: Some(work_thread),
+            id,
+        }
     }
 }
